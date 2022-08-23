@@ -5,6 +5,7 @@
   "description": "Проект «Большое путешествие (простой)» от HTML Academy",
   "scripts": {
     "lint": "eslint src/",
+    "fix": "eslint src/ --fix",
     "build": "webpack --mode production",
     "start": "webpack serve --mode development --open"
   },
@@ -28,5 +29,8 @@
   },
   "engines": {
     "node": "16"
+  },
+  "dependencies": {
+    "dayjs": "1.11.3"
   }
 }
