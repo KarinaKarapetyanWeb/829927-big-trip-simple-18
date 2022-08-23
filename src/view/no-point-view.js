@@ -1,13 +1,9 @@
 import { createElement } from '../render.js';
 
-const createEventsTemplate = () => '<ul class="trip-events__list"></ul>';
+const createNoPointTemplate = () => '<p class="trip-events__msg">Click New Event to create your first point</p>';
 
-export default class EventsView {
+export default class NoPointView {
   #element = null;
-
-  get template() {
-    return createEventsTemplate();
-  }
 
   get element() {
     if (!this.#element) {
@@ -15,6 +11,10 @@ export default class EventsView {
     }
 
     return this.#element;
+  }
+
+  get template() {
+    return createNoPointTemplate();
   }
 
   removeElement() {

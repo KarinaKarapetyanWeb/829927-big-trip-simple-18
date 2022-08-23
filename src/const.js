@@ -4,4 +4,9 @@ const POINTS_COUNT = 5;
 
 const DEFAULT_TRIP_TYPE = 'taxi';
 
-export { POINT_TYPES, POINTS_COUNT, DEFAULT_TRIP_TYPE };
+const ActionType = {
+  EDIT: 'edit',
+  ADD: 'add',
+};
+
+export { POINT_TYPES, POINTS_COUNT, DEFAULT_TRIP_TYPE, ActionType };
