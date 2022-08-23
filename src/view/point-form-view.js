@@ -64,8 +64,6 @@ export default class PointFormView {
     this.#action = action;
     this.#destinations = destinations;
     this.#offers = offers;
-    // ВОПРОС: должны ли быть значения по умолчанию в форме или все поля оставить пустые (поле type)?
-    // Если можно оставить значение по умолчанию, тогда, насколько я понимаю, офферы для типа taxi должны быть уже загружены и могут быть переданы аогументом в конструктор при иницилизации класса в презентере
     this.#point =
       point !== null
         ? point
