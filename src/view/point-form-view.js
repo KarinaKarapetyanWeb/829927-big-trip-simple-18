@@ -7,9 +7,12 @@ import { createPointFormDestinationInfoTemplate } from './template/point-form-de
 import { createPointFormPriceTemplate } from './template/point-form-price-template.js';
 import { createPointFormDatesTemplate } from './template/point-form-dates-template.js';
 import { createPointFormTypesTemplate } from './template/point-form-types-template.js';
+import { createPointFormCloseBtnTemplate } from './template/point-form-close-btn-template.js'
 
-const createPointFormTemplate = (point, destinations, offers) => {
+const createPointFormTemplate = (action, point, destinations, offers) => {
   const { basePrice, dateFrom, dateTo, type, destination, offers: selectedOffersId } = point;
+
+  const isArrowUp = action === 'edit';
 
   const initialPrice = basePrice !== null ? basePrice : '';
 
@@ -38,6 +41,7 @@ const createPointFormTemplate = (point, destinations, offers) => {
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Cancel</button>
+        ${isArrowUp ? createPointFormCloseBtnTemplate() : ''}
     </header>
     ${isOffersAndDestinationInfo
     ? `<section class="event__details">
@@ -50,12 +54,17 @@ const createPointFormTemplate = (point, destinations, offers) => {
 };
 
 export default class PointFormView {
-  constructor(point, destinations, offers) {
-    this.destinations = destinations;
-    this.offers = offers;
-    // ВОПРОС: должны ли быть значения по умолчанию в форме или все поля оставить пустые (поле type)?
-    // Если можно оставить значение по умолчанию, тогда, насколько я понимаю, офферы для типа taxi должны быть уже загружены и могут быть переданы аогументом в конструктор при иницилизации класса в презентере
-    this.point =
+  #element = null;
+  #action = null;
+  #point = null;
+  #destinations = [];
+  #offers = [];
+
+  constructor(action, point, destinations, offers) {
+    this.#action = action;
+    this.#destinations = destinations;
+    this.#offers = offers;
+    this.#point =
       point !== null
         ? point
         : {
@@ -68,19 +77,19 @@ export default class PointFormView {
         };
   }
 
-  getTemplate() {
-    return createPointFormTemplate(this.point, this.destinations, this.offers);
+  get template() {
+    return createPointFormTemplate(this.#action, this.#point, this.#destinations, this.#offers);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

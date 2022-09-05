@@ -1,8 +1,6 @@
 import dayjs from 'dayjs';
 import { getRandomInteger, getRandomItem, getOffersByType } from '../utils.js';
 import { POINT_TYPES } from '../const.js';
-// ВОПРОС: генерацию направлений и офферов я сделала в моках, а не модели, чтобы можно было выбрать рандомные id для точек маршрутов из уже сгенерированной структуры данных
-// На ретроспективе по СД показывалось (http://joxi.ru/8AnwZ3oINZPnjr), что для генерации комментов в функцию generateComments передаются все фильмы и для этого связывались модели - мне показалось это значительным усложнением
 import { destinations } from './destination.js';
 import { offers } from './offer.js';
 import { PointPrice, DaysRange, HoursRange } from './const.js';
