@@ -43,9 +43,6 @@ export default class EventsPresenter {
     const pointFormComponent = new PointFormView(ActionType.EDIT, point, allDestinations, allOffers);
 
     const replaceCardToForm = () => {
-      // при показе формы редактирования - перезаписываем св-во this.offers для подгрузки предложений для типа точки
-      this.#offers = [...this.#offersModel.get(point.type)];
-
       replace(pointFormComponent, pointComponent);
     };
 
@@ -62,6 +59,9 @@ export default class EventsPresenter {
     };
 
     pointComponent.setEditBtnClickHandler(() => {
+      // при показе формы редактирования - перезаписываем св-во this.offers для подгрузки предложений для типа точки
+      this.#offers = [...this.#offersModel.get(point.type)];
+
       replaceCardToForm();
       document.addEventListener('keydown', onEscKeyDown);
     });
