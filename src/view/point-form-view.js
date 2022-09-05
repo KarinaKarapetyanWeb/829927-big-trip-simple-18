@@ -7,7 +7,7 @@ import { createPointFormDestinationInfoTemplate } from './template/point-form-de
 import { createPointFormPriceTemplate } from './template/point-form-price-template.js';
 import { createPointFormDatesTemplate } from './template/point-form-dates-template.js';
 import { createPointFormTypesTemplate } from './template/point-form-types-template.js';
-import { createPointFormCloseBtnTemplate } from './template/point-form-close-btn-template.js'
+import { createPointFormCloseBtnTemplate } from './template/point-form-close-btn-template.js';
 
 const createPointFormTemplate = (action, point, destinations, offers) => {
   const { basePrice, dateFrom, dateTo, type, destination, offers: selectedOffersId } = point;
