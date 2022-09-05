@@ -1,4 +1,4 @@
-import { formatFormDate } from '../../utils.js';
+import { formatFormDate } from '../../utils/date.js';
 
 export const createPointFormDatesTemplate = (dateFrom, dateTo) =>
   `<div class="event__field-group  event__field-group--time">

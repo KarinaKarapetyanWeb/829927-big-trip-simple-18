@@ -1,6 +1,6 @@
-import { createElement } from '../render.js';
-import { getSelectedDestination, getTodayDate } from '../utils.js';
-import { DEFAULT_TRIP_TYPE } from '../const.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import { getSelectedDestination } from '../utils/point.js';
+import { BLANK_POINT } from '../const.js';
 import { createPointFormDestinationTemplate } from './template/point-form-destination-template.js';
 import { createPointFormOffersTemplate } from './template/point-form-offers-template.js';
 import { createPointFormDestinationInfoTemplate } from './template/point-form-destination-info-template.js';
@@ -43,53 +43,53 @@ const createPointFormTemplate = (action, point, destinations, offers) => {
         <button class="event__reset-btn" type="reset">Cancel</button>
         ${isArrowUp ? createPointFormCloseBtnTemplate() : ''}
     </header>
-    ${isOffersAndDestinationInfo
+    ${
+  isOffersAndDestinationInfo
     ? `<section class="event__details">
         ${isOffers ? createPointFormOffersTemplate(offers, selectedOffersId) : ''}
 
         ${isDestinationInfo ? createPointFormDestinationInfoTemplate(initialDestination) : ''}
       </section>`
-    : ''}
+    : ''
+}
   </form>`;
 };
 
-export default class PointFormView {
-  #element = null;
+export default class PointFormView extends AbstractView {
   #action = null;
   #point = null;
   #destinations = [];
   #offers = [];
 
-  constructor(action, point, destinations, offers) {
+  constructor(action, point = BLANK_POINT, destinations, offers) {
+    super();
     this.#action = action;
     this.#destinations = destinations;
     this.#offers = offers;
-    this.#point =
-      point !== null
-        ? point
-        : {
-          basePrice: null,
-          dateFrom: getTodayDate(),
-          dateTo: getTodayDate(),
-          destination: null,
-          offers: [],
-          type: DEFAULT_TRIP_TYPE,
-        };
+    this.#point = point;
   }
 
   get template() {
     return createPointFormTemplate(this.#action, this.#point, this.#destinations, this.#offers);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.addEventListener('submit', this.#formSubmitHandler);
+  };
 
-    return this.#element;
-  }
+  setCloseBtnClickHandler = (callback) => {
+    this._callback.closeClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeBtnClickHandler);
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  };
+
+  #closeBtnClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.closeClick();
+  };
 }
