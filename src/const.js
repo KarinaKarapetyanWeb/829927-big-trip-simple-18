@@ -11,7 +11,7 @@ const ActionType = {
   ADD: 'add',
 };
 
-const SortOptions = {
+const SortType = {
   DAY: 'day',
   EVENT: 'event',
   TIME: 'time',
@@ -33,4 +33,4 @@ const FilterType = {
   EVERYTHING: 'everything',
 };
 
-export { POINT_TYPES, POINTS_COUNT, DEFAULT_TRIP_TYPE, ActionType, BLANK_POINT, FilterType, SortOptions };
+export { POINT_TYPES, POINTS_COUNT, DEFAULT_TRIP_TYPE, ActionType, BLANK_POINT, FilterType, SortType };
