@@ -1,13 +1,13 @@
-import { SortOptions } from '../const';
+import { SortType } from '../const';
 
 // пока сортировка не настроена
 
 const options = {
-  [SortOptions.DAY]: (points) => points,
-  [SortOptions.EVENT]: (points) => points,
-  [SortOptions.TIME]: (points) => points,
-  [SortOptions.PRICE]: (points) => points,
-  [SortOptions.OFFERS]: (points) => points,
+  [SortType.DAY]: (points) => points,
+  [SortType.EVENT]: (points) => points,
+  [SortType.TIME]: (points) => points,
+  [SortType.PRICE]: (points) => points,
+  [SortType.OFFERS]: (points) => points,
 };
 
 export { options };
