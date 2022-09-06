@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 const removeDuplicateId = (array) =>
   array.reduce((acc, n) => {
     const i = acc.findIndex((m) => m.id === n.id);
@@ -18,4 +20,10 @@ const getSelectedOffers = (offers, offersIds) => offers.filter((item) => offersI
 
 const isOfferIsSelected = (offerId, selectedOffersIds) => selectedOffersIds.includes(offerId);
 
-export { removeDuplicateId, getOffersByType, getSelectedDestination, getSelectedOffers, isOfferIsSelected };
+const isStartDateNotExpired = (dateFrom) => dayjs(dateFrom).isAfter(dayjs());
+
+const isEndDateNotExpired = (dateTo) => dayjs(dateTo).isAfter(dayjs());
+
+const isFutureEvent = (dateFrom, dateTo) => isStartDateNotExpired(dateFrom) || isEndDateNotExpired(dateTo);
+
+export { removeDuplicateId, getOffersByType, getSelectedDestination, getSelectedOffers, isOfferIsSelected, isFutureEvent };
