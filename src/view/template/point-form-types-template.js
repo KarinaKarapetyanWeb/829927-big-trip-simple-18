@@ -1,6 +1,6 @@
 import { POINT_TYPES } from '../../const.js';
 
-const renderTypeOptions = (options, currentOption) =>
+const renderTypeOptionsTemplate = (options, currentOption) =>
   options
     .map(
       (option) =>
@@ -22,7 +22,7 @@ export const createPointFormTypesTemplate = (type) =>
     <div class="event__type-list">
         <fieldset class="event__type-group">
         <legend class="visually-hidden">Event type</legend>
-        ${renderTypeOptions(POINT_TYPES, type)}
+        ${renderTypeOptionsTemplate(POINT_TYPES, type)}
         </fieldset>
     </div>
   </div>`;

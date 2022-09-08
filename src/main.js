@@ -6,6 +6,8 @@ import { render } from './framework/render.js';
 import PointsModel from './model/points-model.js';
 import DestinationsModel from './model/destinations-model.js';
 import OffersModel from './model/offers-model.js';
+import { generateFilter } from './mock/filter.js';
+import { generateSortOptions } from './mock/sort.js';
 
 const siteMainElement = document.querySelector('.page-main');
 const siteHeaderElement = document.querySelector('.page-header');
@@ -17,8 +19,13 @@ const destinationsModel = new DestinationsModel();
 const offersModel = new OffersModel();
 const eventsPresenter = new EventsPresenter(tripEventsContainerElement, pointsModel, destinationsModel, offersModel);
 
-render(new FilterView(), tripControlsContainerElement);
-render(new SortView(), tripEventsContainerElement);
+const points = pointsModel.get();
+
+const filters = generateFilter(points);
+const sortOptions = generateSortOptions(points);
+
+render(new FilterView(filters), tripControlsContainerElement);
+render(new SortView(sortOptions), tripEventsContainerElement);
 render(new NewEventBtnView(), newEventsBtnContainerElement);
 
 eventsPresenter.init();

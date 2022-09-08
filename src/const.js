@@ -11,6 +11,14 @@ const ActionType = {
   ADD: 'add',
 };
 
+const SortType = {
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFERS: 'offers',
+};
+
 const BLANK_POINT = {
   basePrice: null,
   dateFrom: getTodayDate(),
@@ -20,4 +28,9 @@ const BLANK_POINT = {
   type: DEFAULT_TRIP_TYPE,
 };
 
-export { POINT_TYPES, POINTS_COUNT, DEFAULT_TRIP_TYPE, ActionType, BLANK_POINT };
+const FilterType = {
+  FUTURE: 'future',
+  EVERYTHING: 'everything',
+};
+
+export { POINT_TYPES, POINTS_COUNT, DEFAULT_TRIP_TYPE, ActionType, BLANK_POINT, FilterType, SortType };

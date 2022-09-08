@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import { getSelectedDestination } from '../utils/point.js';
-import { BLANK_POINT } from '../const.js';
+import { BLANK_POINT, ActionType } from '../const.js';
 import { createPointFormDestinationTemplate } from './template/point-form-destination-template.js';
 import { createPointFormOffersTemplate } from './template/point-form-offers-template.js';
 import { createPointFormDestinationInfoTemplate } from './template/point-form-destination-info-template.js';
@@ -12,7 +12,7 @@ import { createPointFormCloseBtnTemplate } from './template/point-form-close-btn
 const createPointFormTemplate = (action, point, destinations, offers) => {
   const { basePrice, dateFrom, dateTo, type, destination, offers: selectedOffersId } = point;
 
-  const isArrowUp = action === 'edit';
+  const isEditForm = action === ActionType.EDIT;
 
   const initialPrice = basePrice !== null ? basePrice : '';
 
@@ -40,8 +40,8 @@ const createPointFormTemplate = (action, point, destinations, offers) => {
         ${createPointFormPriceTemplate(initialPrice)}
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Cancel</button>
-        ${isArrowUp ? createPointFormCloseBtnTemplate() : ''}
+        <button class="event__reset-btn" type="reset">${isEditForm ? 'Delete' : 'Cancel'}</button>
+        ${isEditForm ? createPointFormCloseBtnTemplate() : ''}
     </header>
     ${
   isOffersAndDestinationInfo

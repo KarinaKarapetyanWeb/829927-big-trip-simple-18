@@ -58,6 +58,11 @@ export default class EventsPresenter {
       }
     };
 
+    const closeForm = () => {
+      replaceFormToCard();
+      document.removeEventListener('keydown', onEscKeyDown);
+    };
+
     pointComponent.setEditBtnClickHandler(() => {
       // при показе формы редактирования - перезаписываем св-во this.offers для подгрузки предложений для типа точки
       this.#offers = [...this.#offersModel.get(point.type)];
@@ -67,13 +72,11 @@ export default class EventsPresenter {
     });
 
     pointFormComponent.setFormSubmitHandler(() => {
-      replaceFormToCard();
-      document.removeEventListener('keydown', onEscKeyDown);
+      closeForm();
     });
 
     pointFormComponent.setCloseBtnClickHandler(() => {
-      replaceFormToCard();
-      document.removeEventListener('keydown', onEscKeyDown);
+      closeForm();
     });
 
     this.#renderEventItem(listItemComponent, pointComponent);

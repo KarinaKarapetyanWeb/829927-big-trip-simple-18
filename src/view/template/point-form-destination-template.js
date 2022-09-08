@@ -1,4 +1,4 @@
-const renderDestinationOptions = (options) => {
+const renderDestinationOptionsTemplate = (options) => {
   if (!options.length) {
     return '';
   }
@@ -10,6 +10,6 @@ export const createPointFormDestinationTemplate = (destinations, initialDestinat
 
   return `<input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationName}" list="destination-list-1">
           <datalist id="destination-list-1">
-            ${renderDestinationOptions(destinations)}
+            ${renderDestinationOptionsTemplate(destinations)}
           </datalist>`;
 };
