@@ -1,5 +1,6 @@
 import { POINT_TYPES } from '../const.js';
-import { getRandomInteger, getRandomItem, removeDuplicateId } from '../utils.js';
+import { getRandomInteger, getRandomItem } from '../utils/common.js';
+import { removeDuplicateId } from '../utils/point.js';
 import { titles, OfferPrice, IdRange, MAX_OFFERS_COUNT } from './const.js';
 
 const generateOffer = () => ({

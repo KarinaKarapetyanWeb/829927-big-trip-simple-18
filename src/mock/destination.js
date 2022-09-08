@@ -1,4 +1,5 @@
-import { getRandomInteger, getRandomItem, removeDuplicateId } from '../utils.js';
+import { getRandomInteger, getRandomItem } from '../utils/common.js';
+import { removeDuplicateId } from '../utils/point.js';
 import { descriptions, names, IdRange, MAX_DESTINATIONS_COUNT } from './const.js';
 
 const generateDestinationDescription = () => getRandomItem(descriptions);

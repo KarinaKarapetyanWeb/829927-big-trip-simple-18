@@ -3,9 +3,10 @@ import EventItemView from '../view/event-item-view.js';
 import PointFormView from '../view/point-form-view.js';
 import PointView from '../view/point-view.js';
 import NoPointView from '../view/no-point-view.js';
-import { render } from '../render.js';
+import { render, replace } from '../framework/render.js';
 import { DEFAULT_TRIP_TYPE, ActionType } from '../const.js';
-import { getSelectedDestination, getSelectedOffers, isEscKey } from '../utils.js';
+import { isEscKey } from '../utils/common.js';
+import { getSelectedDestination, getSelectedOffers } from '../utils/point.js';
 
 export default class EventsPresenter {
   #eventListCopmonent = new EventsView();
@@ -42,11 +43,11 @@ export default class EventsPresenter {
     const pointFormComponent = new PointFormView(ActionType.EDIT, point, allDestinations, allOffers);
 
     const replaceCardToForm = () => {
-      listItemComponent.element.replaceChild(pointFormComponent.element, pointComponent.element);
+      replace(pointFormComponent, pointComponent);
     };
 
     const replaceFormToCard = () => {
-      listItemComponent.element.replaceChild(pointComponent.element, pointFormComponent.element);
+      replace(pointComponent, pointFormComponent);
     };
 
     const onEscKeyDown = (evt) => {
@@ -57,18 +58,20 @@ export default class EventsPresenter {
       }
     };
 
-    pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    pointComponent.setEditBtnClickHandler(() => {
+      // при показе формы редактирования - перезаписываем св-во this.offers для подгрузки предложений для типа точки
+      this.#offers = [...this.#offersModel.get(point.type)];
+
       replaceCardToForm();
       document.addEventListener('keydown', onEscKeyDown);
     });
 
-    pointFormComponent.element.addEventListener('submit', (evt) => {
-      evt.preventDefault();
+    pointFormComponent.setFormSubmitHandler(() => {
       replaceFormToCard();
       document.removeEventListener('keydown', onEscKeyDown);
     });
 
-    pointFormComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    pointFormComponent.setCloseBtnClickHandler(() => {
       replaceFormToCard();
       document.removeEventListener('keydown', onEscKeyDown);
     });
@@ -83,11 +86,8 @@ export default class EventsPresenter {
     }
 
     render(this.#eventListCopmonent, this.#eventsContainer);
-    this.#renderAddPointForm(null, this.#destinations, this.#offers);
+    this.#renderAddPointForm(undefined, this.#destinations, this.#offers);
     for (let i = 0; i < this.#eventPoints.length; i++) {
-      // при показе формы редактирования - перезаписываем св-во this.offers для подгрузки предложений для типа точки
-      this.#offers = [...this.#offersModel.get(this.#eventPoints[i].type)];
-
       const selectedDestination = getSelectedDestination(this.#destinations, this.#eventPoints[i].destination);
       const selectedOffers = getSelectedOffers(this.#offers, this.#eventPoints[i].offers);
 

@@ -1,4 +1,4 @@
-import { isOfferIsSelected } from '../../utils.js';
+import { isOfferIsSelected } from '../../utils/point.js';
 
 const renderOffers = (offers, selectedOffersId) =>
   offers
