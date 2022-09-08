@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-const renderFilters = (filters) =>
+const renderFilterOptionsTemplate = (filters) =>
   filters
     .map(
       (filter, index) => `<div class="trip-filters__filter">
@@ -12,7 +12,7 @@ const renderFilters = (filters) =>
 
 const createFilterTemplate = (filters) =>
   `<form class="trip-filters" action="#" method="get">
-    ${renderFilters(filters)}
+    ${renderFilterOptionsTemplate(filters)}
     <button class="visually-hidden" type="submit">Accept filter</button>
   </form>`;
 

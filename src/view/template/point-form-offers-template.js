@@ -1,6 +1,6 @@
 import { isOfferIsSelected } from '../../utils/point.js';
 
-const renderOffers = (offers, selectedOffersId) =>
+const renderOffersTemplate = (offers, selectedOffersId) =>
   offers
     .map((offer) => {
       const offerName = `event-offer-${offer.id}`;
@@ -20,6 +20,6 @@ export const createPointFormOffersTemplate = (offers, selectedOffersId) =>
   `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${renderOffers(offers, selectedOffersId)}
+      ${renderOffersTemplate(offers, selectedOffersId)}
     </div>
   </section>`;

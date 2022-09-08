@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-const renderSortOptions = (options) =>
+const renderSortOptionsTemplate = (options) =>
   options
     .map(
       (option, index) =>
@@ -13,7 +13,7 @@ const renderSortOptions = (options) =>
 
 const createSortTemplate = (options) =>
   `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-    ${renderSortOptions(options)}
+    ${renderSortOptionsTemplate(options)}
   </form>`;
 
 export default class SortView extends AbstractView {
