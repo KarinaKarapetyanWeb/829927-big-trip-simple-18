@@ -43,14 +43,14 @@ const createPointFormTemplate = (action, point, destinations, offers) => {
         ${isEditForm ? createPointFormCloseBtnTemplate() : ''}
     </header>
     ${
-      isOffersOrDestinationInfo
-        ? `<section class="event__details">
+  isOffersOrDestinationInfo
+    ? `<section class="event__details">
         ${isOffers ? createPointFormOffersTemplate(offersByType, selectedOffersId) : ''}
 
         ${isDestinationInfo ? createPointFormDestinationInfoTemplate(initialDestination) : ''}
       </section>`
-        : ''
-    }
+    : ''
+}
   </form>`;
 };
 
