@@ -13,12 +13,12 @@ const filterContainerElement = siteHeaderElement.querySelector('.trip-controls__
 const eventsContainerElement = siteMainElement.querySelector('.trip-events');
 const newEventsBtnContainerElement = siteHeaderElement.querySelector('.trip-main');
 
+const newPointButtonComponent = new NewPointBtnView();
+
 const pointsModel = new PointsModel();
 const destinationsModel = new DestinationsModel();
 const offersModel = new OffersModel();
 const filterModel = new FilterModel();
-
-const newPointButtonComponent = new NewPointBtnView();
 
 const filterPresenter = new FilterPresenter(filterContainerElement, filterModel, pointsModel);
 const eventsPresenter = new EventsPresenter(eventsContainerElement, pointsModel, destinationsModel, offersModel, filterModel);
