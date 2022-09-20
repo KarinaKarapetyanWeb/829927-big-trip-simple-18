@@ -7,6 +7,8 @@ const createPointTemplate = (point, pointDestination, pointOffers) => {
 
   const { name } = pointDestination;
 
+  const price = basePrice !== null ? basePrice : '';
+
   return `<div class="event">
             <time class="event__date" datetime=${formatDate(dateFrom)}>${humanizeDate(dateFrom)}</time>
             <div class="event__type">
@@ -21,7 +23,7 @@ const createPointTemplate = (point, pointDestination, pointOffers) => {
                 </p>
             </div>
             <p class="event__price">
-                €&nbsp;<span class="event__price-value">${basePrice}</span>
+                €&nbsp;<span class="event__price-value">${price}</span>
             </p>
             <h4 class="visually-hidden">Offers:</h4>
             <ul class="event__selected-offers">

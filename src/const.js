@@ -8,7 +8,7 @@ const DEFAULT_TRIP_TYPE = 'taxi';
 
 const ActionType = {
   EDIT: 'edit',
-  ADD: 'add',
+  CREATE: 'create',
 };
 
 const SortType = {
@@ -18,6 +18,8 @@ const SortType = {
   PRICE: 'price',
   OFFERS: 'offers',
 };
+
+const DEFAULT_SORT_TYPE = SortType.DAY;
 
 const BLANK_POINT = {
   basePrice: null,
@@ -33,4 +35,21 @@ const FilterType = {
   EVERYTHING: 'everything',
 };
 
-export { POINT_TYPES, POINTS_COUNT, DEFAULT_TRIP_TYPE, ActionType, BLANK_POINT, FilterType, SortType };
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
+const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+export { POINT_TYPES, POINTS_COUNT, DEFAULT_TRIP_TYPE, ActionType, BLANK_POINT, FilterType, SortType, Mode, DEFAULT_SORT_TYPE, UserAction, UpdateType };

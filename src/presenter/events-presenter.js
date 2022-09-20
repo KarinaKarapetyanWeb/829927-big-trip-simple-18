@@ -1,108 +1,194 @@
+import { generateSortOptions } from '../mock/sort.js';
+import EventPresenter from './event-presenter.js';
+import CreateEventPresenter from './create-event-presenter.js';
+import NewPointBtnView from '../view/new-event-btn-view';
+import SortView from '../view/sort-view.js';
 import EventsView from '../view/events-view.js';
-import EventItemView from '../view/event-item-view.js';
-import PointFormView from '../view/point-form-view.js';
-import PointView from '../view/point-view.js';
 import NoPointView from '../view/no-point-view.js';
-import { render, replace } from '../framework/render.js';
-import { DEFAULT_TRIP_TYPE, ActionType } from '../const.js';
-import { isEscKey } from '../utils/common.js';
-import { getSelectedDestination, getSelectedOffers } from '../utils/point.js';
+import { render, remove } from '../framework/render.js';
+import { DEFAULT_SORT_TYPE, SortType, UpdateType, UserAction, FilterType } from '../const.js';
+import { sortPoints } from '../utils/sort.js';
+import { filter } from '../utils/filter.js';
 
 export default class EventsPresenter {
-  #eventListCopmonent = new EventsView();
+  #sortOptions = generateSortOptions();
+  #currentSortType = DEFAULT_SORT_TYPE;
+  #currentFilterType = FilterType.EVERYTHING;
 
+  #eventListCopmonent = new EventsView();
+  #newPointBtnView = new NewPointBtnView();
+  #noPointComponent = null;
+  #sortComponent = null;
+
+  #addPointBtnContainer = null;
   #eventsContainer = null;
+
   #pointsModel = null;
   #offersModel = null;
   #destinationsModel = null;
-  #eventPoints = [];
-  #destinations = [];
-  #offers = [];
+  #filterModel = null;
 
-  constructor(eventsContainer, PointsModel, DestinationsModel, OffersModel) {
+  #eventPresenter = new Map();
+
+  #pointNewPresenter = null;
+
+  constructor(addPointBtnContainer, eventsContainer, pointsModel, destinationsModel, offersModel, filterModel) {
+    this.#addPointBtnContainer = addPointBtnContainer;
     this.#eventsContainer = eventsContainer;
-    this.#pointsModel = PointsModel;
-    this.#offersModel = OffersModel;
-    this.#destinationsModel = DestinationsModel;
+    this.#pointsModel = pointsModel;
+    this.#offersModel = offersModel;
+    this.#destinationsModel = destinationsModel;
+    this.#filterModel = filterModel;
+
+    this.#pointNewPresenter = new CreateEventPresenter(this.#eventListCopmonent.element, this.#handleViewAction);
+
+    this.#pointsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  #renderEventItem = (listItem, element) => {
-    render(listItem, this.#eventListCopmonent.element);
-    render(element, listItem.element);
+  get points() {
+    this.#currentFilterType = this.#filterModel.filter;
+    const points = this.#pointsModel.points;
+    const filteredPoints = filter[this.#currentFilterType](points);
+
+    switch (this.#currentSortType) {
+      case SortType.DAY:
+        return sortPoints(filteredPoints, SortType.DAY);
+      case SortType.PRICE:
+        return sortPoints(filteredPoints, SortType.PRICE);
+    }
+
+    return sortPoints(filteredPoints, DEFAULT_SORT_TYPE);
+  }
+
+  get destinations() {
+    return [...this.#destinationsModel.destinations];
+  }
+
+  get offers() {
+    return [...this.#offersModel.offers];
+  }
+
+  init = () => {
+    this.#newPointBtnView.setBtnClickHandler(this.#handleNewPointClick);
+
+    this.#renderEventsBoard();
   };
 
-  #renderAddPointForm = (point, destinations, offers) => {
-    const listItemComponent = new EventItemView();
-    const pointFormComponent = new PointFormView(ActionType.ADD, point, destinations, offers);
-    this.#renderEventItem(listItemComponent, pointFormComponent);
+  #renderSort = () => {
+    this.#sortComponent = new SortView(this.#sortOptions, this.#currentSortType);
+
+    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
+    render(this.#sortComponent, this.#eventsContainer);
   };
 
-  #renderPoint = (point, destination, allDestinations, offers, allOffers) => {
-    const listItemComponent = new EventItemView();
-    const pointComponent = new PointView(point, destination, offers);
-    const pointFormComponent = new PointFormView(ActionType.EDIT, point, allDestinations, allOffers);
+  #renderAddPointForm = (destinations, offers) => {
+    this.#handleModeChange();
 
-    const replaceCardToForm = () => {
-      replace(pointFormComponent, pointComponent);
-    };
-
-    const replaceFormToCard = () => {
-      replace(pointComponent, pointFormComponent);
-    };
-
-    const onEscKeyDown = (evt) => {
-      if (isEscKey(evt)) {
-        evt.preventDefault();
-        replaceFormToCard();
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-    };
-
-    const closeForm = () => {
-      replaceFormToCard();
-      document.removeEventListener('keydown', onEscKeyDown);
-    };
-
-    pointComponent.setEditBtnClickHandler(() => {
-      // при показе формы редактирования - перезаписываем св-во this.offers для подгрузки предложений для типа точки
-      this.#offers = [...this.#offersModel.get(point.type)];
-
-      replaceCardToForm();
-      document.addEventListener('keydown', onEscKeyDown);
-    });
-
-    pointFormComponent.setFormSubmitHandler(() => {
-      closeForm();
-    });
-
-    pointFormComponent.setCloseBtnClickHandler(() => {
-      closeForm();
-    });
-
-    this.#renderEventItem(listItemComponent, pointComponent);
+    const createEventPresenter = new CreateEventPresenter(this.#eventListCopmonent.element);
+    createEventPresenter.init(destinations, offers);
   };
 
-  #renderEvents = () => {
-    if (!this.#eventPoints.length) {
-      render(new NoPointView(), this.#eventsContainer);
+  #renderNoPoints = () => {
+    this.#noPointComponent = new NoPointView(this.#currentFilterType);
+    render(this.#noPointComponent, this.#eventsContainer);
+  };
+
+  #renderPoint = (point, destinations, offers) => {
+    const eventPresenter = new EventPresenter(this.#eventListCopmonent.element, this.#handleViewAction, this.#handleModeChange);
+    eventPresenter.init(point, destinations, offers);
+
+    this.#eventPresenter.set(point.id, eventPresenter);
+  };
+
+  #renderPoints = (points, destinations, offers) => {
+    points.forEach((point) => this.#renderPoint(point, destinations, offers));
+  };
+
+  #clearEventsBoard = ({ resetSortType = false } = {}) => {
+    this.#pointNewPresenter.destroy();
+    this.#eventPresenter.forEach((presenter) => presenter.destroy());
+    this.#eventPresenter.clear();
+
+    remove(this.#sortComponent);
+
+    if (this.#noPointComponent) {
+      remove(this.#noPointComponent);
+    }
+
+    if (resetSortType) {
+      this.#currentSortType = DEFAULT_SORT_TYPE;
+    }
+  };
+
+  #renderEventsBoard = () => {
+    const points = this.points;
+    const pointCount = points.length;
+
+    if (pointCount === 0) {
+      this.#renderNoPoints();
       return;
     }
 
-    render(this.#eventListCopmonent, this.#eventsContainer);
-    this.#renderAddPointForm(undefined, this.#destinations, this.#offers);
-    for (let i = 0; i < this.#eventPoints.length; i++) {
-      const selectedDestination = getSelectedDestination(this.#destinations, this.#eventPoints[i].destination);
-      const selectedOffers = getSelectedOffers(this.#offers, this.#eventPoints[i].offers);
+    this.#renderSort();
 
-      this.#renderPoint(this.#eventPoints[i], selectedDestination, this.#destinations, selectedOffers, this.#offers);
+    render(this.#eventListCopmonent, this.#eventsContainer);
+
+    this.#renderPoints(points, this.destinations, this.offers);
+  };
+
+  createPoint = (callback) => {
+    this.#currentSortType = SortType.DEFAULT;
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#pointNewPresenter.init(this.destinations, this.offers, callback);
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#currentSortType = sortType;
+    this.#clearEventsBoard();
+    this.#renderEventsBoard();
+  };
+
+  #handleNewPointClick = () => {
+    this.#renderAddPointForm(this.destinations, this.offers);
+  };
+
+  #handleViewAction = (actionType, updateType, update) => {
+    switch (actionType) {
+      case UserAction.UPDATE_POINT:
+        this.#pointsModel.updatePoint(updateType, update);
+        break;
+      case UserAction.ADD_POINT:
+        this.#pointsModel.addPoint(updateType, update);
+        break;
+      case UserAction.DELETE_POINT:
+        this.#pointsModel.deletePoint(updateType, update);
+        break;
     }
   };
 
-  init = () => {
-    this.#eventPoints = [...this.#pointsModel.get()];
-    this.#destinations = [...this.#destinationsModel.get()];
-    this.#offers = [...this.#offersModel.get(DEFAULT_TRIP_TYPE)];
+  #handleModelEvent = (updateType, data) => {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#eventPresenter.get(data.id).init(data, this.destinations, this.offers);
+        break;
+      case UpdateType.MINOR:
+        this.#clearEventsBoard();
+        this.#renderEventsBoard();
+        break;
+      case UpdateType.MAJOR:
+        this.#clearEventsBoard({ resetSortType: true });
+        this.#renderEventsBoard();
+        break;
+    }
+  };
 
-    this.#renderEvents();
+  #handleModeChange = () => {
+    this.#pointNewPresenter.destroy();
+    this.#eventPresenter.forEach((presenter) => presenter.resetView());
   };
 }
