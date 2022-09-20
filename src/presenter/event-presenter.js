@@ -17,8 +17,8 @@ export default class EventPresenter {
   #eventEditComponent = null;
 
   #event = null;
-  #destinations = [];
-  #offers = [];
+  #destinationsModel = null;
+  #offersModel = null;
 
   #mode = Mode.DEFAULT;
 
@@ -28,20 +28,20 @@ export default class EventPresenter {
     this.#changeMode = changeMode;
   }
 
-  init = (point, destinations, offers) => {
+  init = (point, destinationsModel, offersModel) => {
     this.#event = point;
-    this.#destinations = destinations;
-    this.#offers = offers;
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
 
-    const selectedDestination = getSelectedDestination(this.#destinations, this.#event.destination);
-    const selectedOffers = getSelectedOffers(getOffersByType(this.#offers, this.#event.type), this.#event.offers);
+    const selectedDestination = getSelectedDestination([...this.#destinationsModel.destinations], this.#event.destination);
+    const selectedOffers = getSelectedOffers(getOffersByType([...this.#offersModel.offers], this.#event.type), this.#event.offers);
 
     const prevEventComponent = this.#eventComponent;
     const prevEventEditComponent = this.#eventEditComponent;
 
     this.#eventItemComponent = new EventItemView();
     this.#eventComponent = new PointView(point, selectedDestination, selectedOffers);
-    this.#eventEditComponent = new PointFormView(ActionType.EDIT, this.#event, this.#destinations, this.#offers);
+    this.#eventEditComponent = new PointFormView(ActionType.EDIT, this.#event, [...this.#destinationsModel.destinations], [...this.#offersModel.offers]);
 
     this.#eventComponent.setEditBtnClickHandler(this.#handleEditClick);
 

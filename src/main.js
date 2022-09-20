@@ -18,7 +18,7 @@ const offersModel = new OffersModel();
 const filterModel = new FilterModel();
 const newPointButtonComponent = new NewPointBtnView();
 const filterPresenter = new FilterPresenter(filterContainerElement, filterModel, pointsModel);
-const eventsPresenter = new EventsPresenter(newEventsBtnContainerElement, eventsContainerElement, pointsModel, destinationsModel, offersModel, filterModel);
+const eventsPresenter = new EventsPresenter(eventsContainerElement, pointsModel, destinationsModel, offersModel, filterModel);
 
 render(newPointButtonComponent, newEventsBtnContainerElement);
 
