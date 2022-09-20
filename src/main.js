@@ -12,11 +12,14 @@ const siteMainElement = document.querySelector('.page-main');
 const filterContainerElement = siteHeaderElement.querySelector('.trip-controls__filters');
 const eventsContainerElement = siteMainElement.querySelector('.trip-events');
 const newEventsBtnContainerElement = siteHeaderElement.querySelector('.trip-main');
+
 const pointsModel = new PointsModel();
 const destinationsModel = new DestinationsModel();
 const offersModel = new OffersModel();
 const filterModel = new FilterModel();
+
 const newPointButtonComponent = new NewPointBtnView();
+
 const filterPresenter = new FilterPresenter(filterContainerElement, filterModel, pointsModel);
 const eventsPresenter = new EventsPresenter(eventsContainerElement, pointsModel, destinationsModel, offersModel, filterModel);
 
