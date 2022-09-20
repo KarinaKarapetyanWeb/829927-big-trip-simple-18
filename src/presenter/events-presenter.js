@@ -20,7 +20,6 @@ export default class EventsPresenter {
   #noPointComponent = null;
   #sortComponent = null;
 
-  #addPointBtnContainer = null;
   #eventsContainer = null;
 
   #pointsModel = null;
@@ -32,8 +31,7 @@ export default class EventsPresenter {
 
   #pointNewPresenter = null;
 
-  constructor(addPointBtnContainer, eventsContainer, pointsModel, destinationsModel, offersModel, filterModel) {
-    this.#addPointBtnContainer = addPointBtnContainer;
+  constructor(eventsContainer, pointsModel, destinationsModel, offersModel, filterModel) {
     this.#eventsContainer = eventsContainer;
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
@@ -61,14 +59,6 @@ export default class EventsPresenter {
     return sortPoints(filteredPoints, DEFAULT_SORT_TYPE);
   }
 
-  get destinations() {
-    return [...this.#destinationsModel.destinations];
-  }
-
-  get offers() {
-    return [...this.#offersModel.offers];
-  }
-
   init = () => {
     this.#newPointBtnView.setBtnClickHandler(this.#handleNewPointClick);
 
@@ -82,11 +72,11 @@ export default class EventsPresenter {
     render(this.#sortComponent, this.#eventsContainer);
   };
 
-  #renderAddPointForm = (destinations, offers) => {
+  #renderAddPointForm = () => {
     this.#handleModeChange();
 
     const createEventPresenter = new CreateEventPresenter(this.#eventListCopmonent.element);
-    createEventPresenter.init(destinations, offers);
+    createEventPresenter.init(this.#destinationsModel, this.#offersModel);
   };
 
   #renderNoPoints = () => {
@@ -134,13 +124,13 @@ export default class EventsPresenter {
 
     render(this.#eventListCopmonent, this.#eventsContainer);
 
-    this.#renderPoints(points, this.destinations, this.offers);
+    this.#renderPoints(points, this.#destinationsModel, this.#offersModel);
   };
 
   createPoint = (callback) => {
     this.#currentSortType = SortType.DEFAULT;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.#pointNewPresenter.init(this.destinations, this.offers, callback);
+    this.#pointNewPresenter.init(this.#destinationsModel, this.#offersModel, callback);
   };
 
   #handleSortTypeChange = (sortType) => {
@@ -154,7 +144,7 @@ export default class EventsPresenter {
   };
 
   #handleNewPointClick = () => {
-    this.#renderAddPointForm(this.destinations, this.offers);
+    this.#renderAddPointForm();
   };
 
   #handleViewAction = (actionType, updateType, update) => {
@@ -174,7 +164,7 @@ export default class EventsPresenter {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#eventPresenter.get(data.id).init(data, this.destinations, this.offers);
+        this.#eventPresenter.get(data.id).init(data, this.#destinationsModel, this.#offersModel);
         break;
       case UpdateType.MINOR:
         this.#clearEventsBoard();

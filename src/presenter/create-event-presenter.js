@@ -11,8 +11,8 @@ export default class CreateEventPresenter {
   #eventItemComponent = null;
   #createEventComponent = null;
 
-  #destinations = [];
-  #offers = [];
+  #destinationsModel = null;
+  #offersModel = null;
 
   #changeData = null;
   #destroyCallback = null;
@@ -22,9 +22,9 @@ export default class CreateEventPresenter {
     this.#changeData = changeData;
   }
 
-  init = (destinations, offers, callback) => {
-    this.#destinations = destinations;
-    this.#offers = offers;
+  init = (destinationsModel, offersModel, callback) => {
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
     this.#destroyCallback = callback;
 
     if (this.#createEventComponent !== null) {
@@ -32,7 +32,7 @@ export default class CreateEventPresenter {
     }
 
     this.#eventItemComponent = new EventItemView();
-    this.#createEventComponent = new PointFormView(ActionType.CREATE, undefined, this.#destinations, this.#offers);
+    this.#createEventComponent = new PointFormView(ActionType.CREATE, undefined, [...this.#destinationsModel.destinations], [...this.#offersModel.offers]);
 
     this.#createEventComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#createEventComponent.setDeleteClickHandler(this.#handleDeleteClick);
