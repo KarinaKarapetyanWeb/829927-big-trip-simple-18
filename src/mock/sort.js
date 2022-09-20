@@ -1,7 +1,7 @@
 import { options } from '../utils/sort.js';
 
-export const generateSortOptions = (points) =>
-  Object.entries(options).map(([optionName, filterPoints]) => ({
+export const generateSortOptions = () =>
+  Object.entries(options).map(([optionName, isDisabledOption]) => ({
     name: optionName,
-    sortedPoints: filterPoints(points),
+    disabled: isDisabledOption(optionName),
   }));

@@ -16,6 +16,8 @@ const getOffersByType = (offers, type) => offers.find((offer) => offer.type === 
 
 const getSelectedDestination = (destinations, destinationId) => destinations.find((item) => item.id === destinationId);
 
+const getDestinationId = (destinations, destinationName) => destinations.find((item) => item.name === destinationName).id;
+
 const getSelectedOffers = (offers, offersIds) => offers.filter((item) => offersIds.some((offerId) => offerId === item.id));
 
 const isOfferIsSelected = (offerId, selectedOffersIds) => selectedOffersIds.includes(offerId);
@@ -26,4 +28,8 @@ const isEndDateNotExpired = (dateTo) => dayjs(dateTo).isAfter(dayjs());
 
 const isFutureEvent = (dateFrom, dateTo) => isStartDateNotExpired(dateFrom) || isEndDateNotExpired(dateTo);
 
-export { removeDuplicateId, getOffersByType, getSelectedDestination, getSelectedOffers, isOfferIsSelected, isFutureEvent };
+const isDatesEqual = (dateA, dateB) => (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
+
+const isPricesEqual = (priceA, priceB) => (priceA === null && priceB === null) || priceA === priceB;
+
+export { removeDuplicateId, getOffersByType, getSelectedDestination, getDestinationId, getSelectedOffers, isOfferIsSelected, isFutureEvent, isDatesEqual, isPricesEqual };

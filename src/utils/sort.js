@@ -1,13 +1,23 @@
 import { SortType } from '../const';
-
-// пока сортировка не настроена
+import dayjs from 'dayjs';
 
 const options = {
-  [SortType.DAY]: (points) => points,
-  [SortType.EVENT]: (points) => points,
-  [SortType.TIME]: (points) => points,
-  [SortType.PRICE]: (points) => points,
-  [SortType.OFFERS]: (points) => points,
+  [SortType.DAY]: () => false,
+  [SortType.EVENT]: () => true,
+  [SortType.TIME]: () => true,
+  [SortType.PRICE]: () => false,
+  [SortType.OFFERS]: () => true,
 };
 
-export { options };
+const sortPoints = (points, sortType) => {
+  switch (sortType) {
+    case SortType.DAY:
+      return points.sort((pointA, pointB) => dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom)));
+    case SortType.PRICE:
+      return points.sort((pointA, pointB) => pointB.basePrice - pointA.basePrice);
+    default:
+      return points;
+  }
+};
+
+export { options, sortPoints };
