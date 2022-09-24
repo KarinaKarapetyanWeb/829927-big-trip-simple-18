@@ -1,13 +1,13 @@
-import { generateSortOptions } from '../mock/sort.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import EventPresenter from './event-presenter.js';
 import CreateEventPresenter from './create-event-presenter.js';
-import NewPointBtnView from '../view/new-event-btn-view';
 import SortView from '../view/sort-view.js';
 import EventsView from '../view/events-view.js';
 import NoPointView from '../view/no-point-view.js';
-import { render, remove } from '../framework/render.js';
-import { DEFAULT_SORT_TYPE, SortType, UpdateType, UserAction, FilterType } from '../const.js';
-import { sortPoints } from '../utils/sort.js';
+import LoadingView from '../view/loading-view.js';
+import { render, remove, RenderPosition } from '../framework/render.js';
+import { DEFAULT_SORT_TYPE, SortType, UpdateType, UserAction, FilterType, DataType, TimeBlockLimit } from '../const.js';
+import { sortPoints, generateSortOptions } from '../utils/sort.js';
 import { filter } from '../utils/filter.js';
 
 export default class EventsPresenter {
@@ -16,11 +16,12 @@ export default class EventsPresenter {
   #currentFilterType = FilterType.EVERYTHING;
 
   #eventListCopmonent = new EventsView();
-  #newPointBtnView = new NewPointBtnView();
+  #loadingComponent = new LoadingView();
+
   #noPointComponent = null;
   #sortComponent = null;
 
-  #eventsContainer = null;
+  #eventsContainerElement = null;
 
   #pointsModel = null;
   #offersModel = null;
@@ -28,11 +29,16 @@ export default class EventsPresenter {
   #filterModel = null;
 
   #eventPresenter = new Map();
-
   #pointNewPresenter = null;
 
-  constructor(eventsContainer, pointsModel, destinationsModel, offersModel, filterModel) {
-    this.#eventsContainer = eventsContainer;
+  #isPointsLoading = true;
+  #isOffersLoading = true;
+  #isDestinationsLoading = true;
+
+  #uiBlocker = new UiBlocker(TimeBlockLimit.LOWER_LIMIT, TimeBlockLimit.UPPER_LIMIT);
+
+  constructor(eventsContainerElement, pointsModel, destinationsModel, offersModel, filterModel) {
+    this.#eventsContainerElement = eventsContainerElement;
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
@@ -41,6 +47,9 @@ export default class EventsPresenter {
     this.#pointNewPresenter = new CreateEventPresenter(this.#eventListCopmonent.element, this.#handleViewAction);
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
+    this.#offersModel.addObserver(this.#handleModelEvent);
+    this.#destinationsModel.addObserver(this.#handleModelEvent);
+
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
@@ -60,8 +69,6 @@ export default class EventsPresenter {
   }
 
   init = () => {
-    this.#newPointBtnView.setBtnClickHandler(this.#handleNewPointClick);
-
     this.#renderEventsBoard();
   };
 
@@ -69,30 +76,27 @@ export default class EventsPresenter {
     this.#sortComponent = new SortView(this.#sortOptions, this.#currentSortType);
 
     this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
-    render(this.#sortComponent, this.#eventsContainer);
-  };
-
-  #renderAddPointForm = () => {
-    this.#handleModeChange();
-
-    const createEventPresenter = new CreateEventPresenter(this.#eventListCopmonent.element);
-    createEventPresenter.init(this.#destinationsModel, this.#offersModel);
+    render(this.#sortComponent, this.#eventsContainerElement, RenderPosition.AFTERBEGIN);
   };
 
   #renderNoPoints = () => {
     this.#noPointComponent = new NoPointView(this.#currentFilterType);
-    render(this.#noPointComponent, this.#eventsContainer);
+    render(this.#noPointComponent, this.#eventsContainerElement);
   };
 
-  #renderPoint = (point, destinations, offers) => {
+  #renderLoading = () => {
+    render(this.#loadingComponent, this.#eventsContainerElement);
+  };
+
+  #renderPoint = (point) => {
     const eventPresenter = new EventPresenter(this.#eventListCopmonent.element, this.#handleViewAction, this.#handleModeChange);
-    eventPresenter.init(point, destinations, offers);
+    eventPresenter.init(point, this.#destinationsModel, this.#offersModel);
 
     this.#eventPresenter.set(point.id, eventPresenter);
   };
 
-  #renderPoints = (points, destinations, offers) => {
-    points.forEach((point) => this.#renderPoint(point, destinations, offers));
+  #renderPoints = (points) => {
+    points.forEach((point) => this.#renderPoint(point));
   };
 
   #clearEventsBoard = ({ resetSortType = false } = {}) => {
@@ -101,6 +105,7 @@ export default class EventsPresenter {
     this.#eventPresenter.clear();
 
     remove(this.#sortComponent);
+    remove(this.#loadingComponent);
 
     if (this.#noPointComponent) {
       remove(this.#noPointComponent);
@@ -112,25 +117,41 @@ export default class EventsPresenter {
   };
 
   #renderEventsBoard = () => {
-    const points = this.points;
-    const pointCount = points.length;
+    if (this.#isPointsLoading || this.#isOffersLoading || this.#isDestinationsLoading) {
+      this.#renderLoading();
+      return;
+    }
 
-    if (pointCount === 0) {
+    const points = this.points;
+    const destinations = [...this.#destinationsModel.destinations];
+    render(this.#eventListCopmonent, this.#eventsContainerElement);
+
+    if (points.length === 0 || destinations.length === 0) {
       this.#renderNoPoints();
       return;
     }
 
     this.#renderSort();
 
-    render(this.#eventListCopmonent, this.#eventsContainer);
-
-    this.#renderPoints(points, this.#destinationsModel, this.#offersModel);
+    this.#renderPoints(points);
   };
 
   createPoint = (callback) => {
     this.#currentSortType = SortType.DEFAULT;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#pointNewPresenter.init(this.#destinationsModel, this.#offersModel, callback);
+  };
+
+  #toggleLoadingIndicatorsByType = (type) => {
+    if (type === DataType.POINTS) {
+      this.#isPointsLoading = false;
+    }
+    if (type === DataType.OFFERS) {
+      this.#isOffersLoading = false;
+    }
+    if (type === DataType.DESTINATIONS) {
+      this.#isDestinationsLoading = false;
+    }
   };
 
   #handleSortTypeChange = (sortType) => {
@@ -143,22 +164,40 @@ export default class EventsPresenter {
     this.#renderEventsBoard();
   };
 
-  #handleNewPointClick = () => {
-    this.#renderAddPointForm();
-  };
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
 
-  #handleViewAction = (actionType, updateType, update) => {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this.#pointsModel.updatePoint(updateType, update);
+        this.#eventPresenter.get(update.id).setSaving();
+
+        try {
+          await this.#pointsModel.updatePoint(updateType, update);
+        } catch (err) {
+          this.#eventPresenter.get(update.id).setAborting();
+        }
         break;
       case UserAction.ADD_POINT:
-        this.#pointsModel.addPoint(updateType, update);
+        this.#pointNewPresenter.setSaving();
+
+        try {
+          await this.#pointsModel.addPoint(updateType, update);
+        } catch (err) {
+          this.#pointNewPresenter.get(update.id).setAborting();
+        }
         break;
       case UserAction.DELETE_POINT:
-        this.#pointsModel.deletePoint(updateType, update);
+        this.#eventPresenter.get(update.id).setDeleting();
+
+        try {
+          await this.#pointsModel.deletePoint(updateType, update);
+        } catch (err) {
+          this.#eventPresenter.get(update.id).setAborting();
+        }
         break;
     }
+
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
@@ -173,6 +212,14 @@ export default class EventsPresenter {
       case UpdateType.MAJOR:
         this.#clearEventsBoard({ resetSortType: true });
         this.#renderEventsBoard();
+        break;
+      case UpdateType.INIT:
+        this.#toggleLoadingIndicatorsByType(data);
+
+        if (!this.#isPointsLoading && !this.#isOffersLoading && !this.#isDestinationsLoading) {
+          remove(this.#loadingComponent);
+          this.#renderEventsBoard();
+        }
         break;
     }
   };

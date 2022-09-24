@@ -10,6 +10,9 @@ const renderDestinationPictures = (pictures) => {
 };
 
 export const createPointFormDestinationInfoTemplate = (destination) => {
+  if (!destination) {
+    return '';
+  }
   const { description, pictures } = destination;
   const destinationDescription = description ? description : '';
 

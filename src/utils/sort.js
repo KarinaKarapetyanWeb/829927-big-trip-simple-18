@@ -20,4 +20,10 @@ const sortPoints = (points, sortType) => {
   }
 };
 
-export { options, sortPoints };
+const generateSortOptions = () =>
+  Object.entries(options).map(([optionName, isDisabledOption]) => ({
+    name: optionName,
+    disabled: isDisabledOption(optionName),
+  }));
+
+export { options, sortPoints, generateSortOptions };

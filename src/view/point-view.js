@@ -2,7 +2,7 @@ import AbstractView from '../framework/view/abstract-view.js';
 import { formatDate, humanizeDate, formatTime } from '../utils/date.js';
 import { createPointOffersTemplate } from './template/point-offers-template.js';
 
-const createPointTemplate = (point, pointDestination, pointOffers) => {
+const createPointTemplate = (point, pointDestination = { name: '' }, pointOffers) => {
   const { basePrice, dateFrom, dateTo, type } = point;
 
   const { name } = pointDestination;
