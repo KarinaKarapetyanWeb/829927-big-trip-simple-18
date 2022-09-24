@@ -17,8 +17,8 @@ export default class EventPresenter {
   #eventEditComponent = null;
 
   #event = null;
-  #destinationsModel = null;
-  #offersModel = null;
+  #destinations = [];
+  #offers = [];
 
   #mode = Mode.DEFAULT;
 
@@ -30,18 +30,21 @@ export default class EventPresenter {
 
   init = (point, destinationsModel, offersModel) => {
     this.#event = point;
-    this.#destinationsModel = destinationsModel;
-    this.#offersModel = offersModel;
+    this.#destinations = [...destinationsModel.destinations];
+    this.#offers = [...offersModel.offers];
 
-    const selectedDestination = getSelectedDestination([...this.#destinationsModel.destinations], this.#event.destination);
-    const selectedOffers = getSelectedOffers(getOffersByType([...this.#offersModel.offers], this.#event.type), this.#event.offers);
+    const selectedDestination = getSelectedDestination(this.#destinations, this.#event.destination);
+
+    const offersByType = getOffersByType(this.#offers, this.#event.type);
+
+    const selectedOffers = getSelectedOffers(offersByType, this.#event.offers);
 
     const prevEventComponent = this.#eventComponent;
     const prevEventEditComponent = this.#eventEditComponent;
 
     this.#eventItemComponent = new EventItemView();
     this.#eventComponent = new PointView(point, selectedDestination, selectedOffers);
-    this.#eventEditComponent = new PointFormView(ActionType.EDIT, this.#event, [...this.#destinationsModel.destinations], [...this.#offersModel.offers]);
+    this.#eventEditComponent = new PointFormView(ActionType.EDIT, this.#event, this.#destinations, this.#offers);
 
     this.#eventComponent.setEditBtnClickHandler(this.#handleEditClick);
 
@@ -61,7 +64,8 @@ export default class EventPresenter {
     }
 
     if (this.#mode === Mode.EDITING) {
-      replace(this.#eventEditComponent, prevEventEditComponent);
+      replace(this.#eventComponent, prevEventEditComponent);
+      this.#mode = Mode.DEFAULT;
     }
 
     remove(prevEventComponent);
@@ -78,6 +82,41 @@ export default class EventPresenter {
     if (this.#mode !== Mode.DEFAULT) {
       this.#replaceFormToPoint();
     }
+  };
+
+  setSaving = () => {
+    if (this.#mode === Mode.EDITING) {
+      this.#eventEditComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  };
+
+  setDeleting = () => {
+    if (this.#mode === Mode.EDITING) {
+      this.#eventEditComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  };
+
+  setAborting = () => {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#eventComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#eventEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#eventEditComponent.shake(resetFormState);
   };
 
   #escKeyDownHandler = (evt) => {
@@ -115,7 +154,6 @@ export default class EventPresenter {
     const isMinorUpdate = !isDatesEqual(this.#event.dateFrom, update.dateFrom) || !isPricesEqual(this.#event.basePrice, update.basePrice);
 
     this.#changeData(UserAction.UPDATE_POINT, isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH, update);
-    this.#replaceFormToPoint();
   };
 
   #handleDeleteClick = (point) => {

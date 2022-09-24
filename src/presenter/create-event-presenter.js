@@ -4,15 +4,14 @@ import PointFormView from '../view/point-form-view.js';
 import { ActionType, UserAction, UpdateType } from '../const.js';
 import { isEscKey } from '../utils/common.js';
 import { renderEventListItem } from '../utils/event.js';
-import { nanoid } from 'nanoid';
 
 export default class CreateEventPresenter {
   #eventListCopmonent = null;
   #eventItemComponent = null;
   #createEventComponent = null;
 
-  #destinationsModel = null;
-  #offersModel = null;
+  #destinations = [];
+  #offers = [];
 
   #changeData = null;
   #destroyCallback = null;
@@ -23,8 +22,8 @@ export default class CreateEventPresenter {
   }
 
   init = (destinationsModel, offersModel, callback) => {
-    this.#destinationsModel = destinationsModel;
-    this.#offersModel = offersModel;
+    this.#destinations = [...destinationsModel.destinations];
+    this.#offers = [...offersModel.offers];
     this.#destroyCallback = callback;
 
     if (this.#createEventComponent !== null) {
@@ -32,7 +31,7 @@ export default class CreateEventPresenter {
     }
 
     this.#eventItemComponent = new EventItemView();
-    this.#createEventComponent = new PointFormView(ActionType.CREATE, undefined, [...this.#destinationsModel.destinations], [...this.#offersModel.offers]);
+    this.#createEventComponent = new PointFormView(ActionType.CREATE, undefined, this.#destinations, this.#offers);
 
     this.#createEventComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#createEventComponent.setDeleteClickHandler(this.#handleDeleteClick);
@@ -58,6 +57,25 @@ export default class CreateEventPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
+  setSaving = () => {
+    this.#createEventComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  };
+
+  setAborting = () => {
+    const resetFormState = () => {
+      this.#createEventComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#createEventComponent.shake(resetFormState);
+  };
+
   #escKeyDownHandler = (evt) => {
     if (isEscKey(evt) && evt.target.tagName !== 'INPUT') {
       evt.preventDefault();
@@ -68,14 +86,7 @@ export default class CreateEventPresenter {
   };
 
   #handleFormSubmit = (point) => {
-    this.#changeData(
-      UserAction.ADD_POINT,
-      UpdateType.MINOR,
-      // Пока у нас нет сервера, который бы после сохранения
-      // выдывал честный id задачи, нам нужно позаботиться об этом самим
-      { id: nanoid(), ...point }
-    );
-    this.destroy();
+    this.#changeData(UserAction.ADD_POINT, UpdateType.MINOR, point);
   };
 
   #handleDeleteClick = () => {

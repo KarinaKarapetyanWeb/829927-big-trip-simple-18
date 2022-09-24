@@ -5,10 +5,12 @@ const renderDestinationOptionsTemplate = (options) => {
   return options.map((option) => `<option value=${option.name}></option>`).join('');
 };
 
-export const createPointFormDestinationTemplate = (destinations, initialDestination) => {
-  const destinationName = initialDestination !== null ? initialDestination.name : '';
+export const createPointFormDestinationTemplate = (destinations, initialDestination, isDisabled) => {
+  const destinationName = initialDestination ? initialDestination.name : '';
 
-  return `<input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationName}" list="destination-list-1">
+  return `<input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationName}" list="destination-list-1" ${
+    isDisabled ? 'disabled' : ''
+  }>
           <datalist id="destination-list-1">
             ${renderDestinationOptionsTemplate(destinations)}
           </datalist>`;

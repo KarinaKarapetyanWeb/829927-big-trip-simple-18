@@ -12,9 +12,20 @@ const removeDuplicateId = (array) =>
     return acc;
   }, []);
 
-const getOffersByType = (offers, type) => offers.find((offer) => offer.type === type).offers;
+const getOffersByType = (offers, type) => {
+  if (!offers.length) {
+    return [];
+  }
 
-const getSelectedDestination = (destinations, destinationId) => destinations.find((item) => item.id === destinationId);
+  return offers.find((offer) => offer.type === type).offers;
+};
+
+const getSelectedDestination = (destinations, destinationId) => {
+  if (!destinationId) {
+    return null;
+  }
+  return destinations.find((item) => Number(item.id) === Number(destinationId));
+};
 
 const getDestinationId = (destinations, destinationName) => destinations.find((item) => item.name === destinationName).id;
 

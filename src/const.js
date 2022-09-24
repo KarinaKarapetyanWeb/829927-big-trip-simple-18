@@ -50,6 +50,30 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
+  // ERROR: 'ERROR'
 };
 
-export { POINT_TYPES, POINTS_COUNT, DEFAULT_TRIP_TYPE, ActionType, BLANK_POINT, FilterType, SortType, Mode, DEFAULT_SORT_TYPE, UserAction, UpdateType };
+const DataType = {
+  POINTS: 'POINTS',
+  OFFERS: 'OFFERS',
+  DESTINATIONS: 'DESTINATIONS',
+};
+
+const TimeBlockLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
+
+const Method = {
+  GET: 'GET',
+  PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
+};
+
+const AUTHORIZATION = 'Basic hS2sfS44sklwcl1sa2ujskj';
+
+const END_POINT = 'https://18.ecmascript.pages.academy/big-trip';
+
+export { POINT_TYPES, POINTS_COUNT, DEFAULT_TRIP_TYPE, ActionType, BLANK_POINT, FilterType, SortType, Mode, DEFAULT_SORT_TYPE, UserAction, UpdateType, DataType, TimeBlockLimit, Method, AUTHORIZATION, END_POINT };

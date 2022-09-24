@@ -13,39 +13,49 @@ import { createPointFormCloseBtnTemplate } from './template/point-form-close-btn
 import { getDestinationId, getOffersByType } from '../utils/point.js';
 
 const createPointFormTemplate = (action, point, destinations, offers) => {
-  const { basePrice, dateFrom, dateTo, destination, type, offers: selectedOffersId } = point;
-  // const isSubmitDisabled = ;
+  const { basePrice, dateFrom, dateTo, destination, type, offers: selectedOffersId, isDisabled, isSaving, isDeleting } = point;
   const isEditForm = action === ActionType.EDIT;
   const initialPrice = basePrice !== null ? basePrice : '';
-  const initialDestination = destination !== null ? getSelectedDestination(destinations, destination) : destination;
+  const initialDestination = destination !== null ? getSelectedDestination(destinations, destination) : null;
   const offersByType = getOffersByType(offers, point.type);
   const isDestinationInfo = destination !== null;
   const isOffers = offersByType.length !== 0;
   const isOffersOrDestinationInfo = isOffers || isDestinationInfo;
+  const isSubmitDisabled = !initialPrice || !initialDestination || !dateFrom || !dateTo;
+
+  const getDeleteBtnLabel = () => {
+    let label;
+    if (!isDeleting) {
+      label = isEditForm ? 'Delete' : 'Cancel';
+    } else {
+      label = isEditForm ? 'Deleting' : 'Cancelling';
+    }
+    return label;
+  };
 
   return `<form class="event event--edit" action="#" method="post">
     <header class="event__header">
-        ${createPointFormTypesTemplate(type)}
+        ${createPointFormTypesTemplate(type, isDisabled)}
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
           </label>
-          ${createPointFormDestinationTemplate(destinations, initialDestination)}
+          ${createPointFormDestinationTemplate(destinations, initialDestination, isDisabled)}
         </div>
 
-        ${createPointFormDatesTemplate(dateFrom, dateTo)}
+        ${createPointFormDatesTemplate(dateFrom, dateTo, isDisabled)}
 
-        ${createPointFormPriceTemplate(initialPrice)}
+        ${createPointFormPriceTemplate(initialPrice, isDisabled)}
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">${isEditForm ? 'Delete' : 'Cancel'}</button>
-        ${isEditForm ? createPointFormCloseBtnTemplate() : ''}
+        <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled || isSubmitDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+        <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${getDeleteBtnLabel()}</button>
+        ${isEditForm ? createPointFormCloseBtnTemplate(isDisabled) : ''}
     </header>
     ${
   isOffersOrDestinationInfo
     ? `<section class="event__details">
-        ${isOffers ? createPointFormOffersTemplate(offersByType, selectedOffersId) : ''}
+        ${isOffers ? createPointFormOffersTemplate(offersByType, selectedOffersId, isDisabled) : ''}
 
         ${isDestinationInfo ? createPointFormDestinationInfoTemplate(initialDestination) : ''}
       </section>`
@@ -250,7 +260,15 @@ export default class PointFormView extends AbstractStatefulView {
     }
   };
 
-  static parsePointToState = (point) => ({ ...point });
+  static parsePointToState = (point) => ({ ...point, isDisabled: false, isSaving: false, isDeleting: false });
 
-  static parseStateToPoint = (state) => ({ ...state });
+  static parseStateToPoint = (state) => {
+    const point = { ...state };
+
+    delete point.isDisabled;
+    delete point.isSaving;
+    delete point.isDeleting;
+
+    return point;
+  };
 }
