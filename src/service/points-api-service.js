@@ -47,8 +47,11 @@ export default class PointsApiService extends ApiService {
       'base_price': point.basePrice,
       'date_to': point.dateTo,
       'date_from': point.dateFrom,
-      'is_favorite': false,
     };
+
+    if (!adaptedPoint.is_favorite) {
+      adaptedPoint['is_favorite'] = false;
+    }
 
     // Ненужные ключи мы удаляем
     delete adaptedPoint.basePrice;
