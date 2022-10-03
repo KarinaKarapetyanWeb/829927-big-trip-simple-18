@@ -1,16 +1,16 @@
-name: Deploy
-
 on: 
   push: 
     branches: 
       - master 
 
+name: Project deploy 
 jobs: 
   deploy: 
+    name: Deploy
     runs-on: ubuntu-latest
     strategy: 
       matrix: 
-        node-version: [16.x]
+        node-version: '16'
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -25,4 +25,4 @@ jobs:
       - run: npm install
       - run: npm run build
       # Deploy
-      - run: cd dist && rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --copmress --delete . karinakarapetyanweb@829927-big-trip-simple-18:/var/www/829927-big-trip-simple-18/html/
+      - run: cd dist && rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . karinakarapetyanweb@829927-big-trip-simple-18:/var/www/829927-big-trip-simple-18/html/
