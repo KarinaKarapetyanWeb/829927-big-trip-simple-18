@@ -3,7 +3,7 @@
   "version": "18.0.0",
   "private": true,
   "description": "Проект «Большое путешествие (простой)» от HTML Academy",
-  "homepage": "https://karinakarapetyanweb.github.io/829927-big-trip-simple-18/",
+  "homepage": "https://karinakarapetyanweb.github.io/829927-big-trip-simple-18",
   "scripts": {
     "lint": "eslint src/",
     "fix": "eslint src/ --fix",
