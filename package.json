@@ -3,11 +3,14 @@
   "version": "18.0.0",
   "private": true,
   "description": "Проект «Большое путешествие (простой)» от HTML Academy",
+  "homepage": "https://karinakarapetyanweb.github.io/829927-big-trip-simple-18/",
   "scripts": {
     "lint": "eslint src/",
     "fix": "eslint src/ --fix",
     "build": "webpack --mode production",
-    "start": "webpack serve --mode development --open"
+    "start": "webpack serve --mode development --open",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "browserslist": [
     "last 2 versions",
@@ -34,6 +37,7 @@
   },
   "dependencies": {
     "dayjs": "1.11.3",
-    "flatpickr": "4.6.13"
+    "flatpickr": "4.6.13",
+    "gh-pages": "^4.0.0"
   }
 }
