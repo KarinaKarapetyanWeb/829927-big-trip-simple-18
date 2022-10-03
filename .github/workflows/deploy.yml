@@ -25,4 +25,12 @@ jobs:
       - run: npm install
       - run: npm run build
       # Deploy
-      - run: cd dist && rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . karinakarapetyanweb@829927-big-trip-simple-18:/var/www/829927-big-trip-simple-18/html/
+      # - run: cd dist && rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . karinakarapetyanweb@829927-big-trip-simple-18:/var/www/829927-big-trip-simple-18/html/
+      - uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          # в значение GITHUB_TOKEN помещается ссылка на ваш секрет в репозитории
+          # в данном случае его название KEY
+          GITHUB_TOKEN: ${{ secrets.key }}
+          BRANCH: gh-pages
+          FOLDER: public
+          CLEAN: true
