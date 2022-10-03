@@ -11,18 +11,18 @@ jobs:
     startegy: 
       matrix: 
         node-version: [16.x]
-      steps:
-        - uses: actions/checkout@v2
-        - uses: actions/setup-node@v1
-        with: 
-          node-version: ${{ matrix.node-version }}
-        # Setup key
-        - run: set -eu
-        - run: mkdir "$HOME/.ssh"
-        - run: echo "${{ secrets.key }}" > "$HOME/.ssh/key"
-        - run: chmod 600 "$HOME/.ssh/key"
-        # Build
-        - run: npm install
-        - run: npm run build
-        # Deploy
-        - run: cd dist && rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --copmress --delete . karinakarapetyan@829927-big-trip-simple-18:/var/www/829927-big-trip-simple-18/html/
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      with: 
+        node-version: ${{ matrix.node-version }}
+      # Setup key
+      - run: set -eu
+      - run: mkdir "$HOME/.ssh"
+      - run: echo "${{ secrets.key }}" > "$HOME/.ssh/key"
+      - run: chmod 600 "$HOME/.ssh/key"
+      # Build
+      - run: npm install
+      - run: npm run build
+      # Deploy
+      - run: cd dist && rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --copmress --delete . karinakarapetyan@829927-big-trip-simple-18:/var/www/829927-big-trip-simple-18/html/
