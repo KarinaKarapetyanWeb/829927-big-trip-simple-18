@@ -25,4 +25,4 @@ jobs:
       - run: npm install
       - run: npm run build
       # Deploy
-      - run: cd dist && rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --copmress --delete . karinakarapetyan@829927-big-trip-simple-18:/var/www/829927-big-trip-simple-18/html/
+      - run: cd dist && rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --copmress --delete . karinakarapetyanweb@829927-big-trip-simple-18:/var/www/829927-big-trip-simple-18/html/
