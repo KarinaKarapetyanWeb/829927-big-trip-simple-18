@@ -11,21 +11,34 @@ jobs:
     strategy: 
       matrix: 
         node-version: [16.x]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with: 
-          node-version: ${{ matrix.node-version }}
-      # Setup key
-      - run: set -eu
-      - run: mkdir "$HOME/.ssh"
-      - run: echo "${{ secrets.key }}" > "$HOME/.ssh/key"
-      - run: chmod 600 "$HOME/.ssh/key"
-      # Build
-      - run: npm install
-      - run: npm run build
+    # steps:
+    #   - uses: actions/checkout@v2
+    #   - uses: actions/setup-node@v1
+    #     with: 
+    #       node-version: ${{ matrix.node-version }}
+    #   # Setup key
+    #   - run: set -eu
+    #   - run: mkdir "$HOME/.ssh"
+    #   - run: echo "${{ secrets.key }}" > "$HOME/.ssh/key"
+    #   - run: chmod 600 "$HOME/.ssh/key"
+    #   # Build
+    #   - run: npm install
+    #   - run: npm run build
       # Deploy
       # - run: cd dist && rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . karinakarapetyanweb@829927-big-trip-simple-18:/var/www/829927-big-trip-simple-18/html/
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2.3.1
+        with:
+          persist-credentials: false
+
+      - name: Install 🔧
+        run: npm install
+
+      - name: Build 👷
+        run: npm run build
+
+      - name: Deploy 🚀
       - uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           # в значение GITHUB_TOKEN помещается ссылка на ваш секрет в репозитории
